@@ -4,8 +4,18 @@ import sendResponse from '../../uitls/sendResponse';
 import { AdminServices } from './admin.service';
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
-  const { _id, brand, price, category, description, quantity, inStock } =
-    await AdminServices.createProductToDB(req.body);
+  const {
+    _id,
+    title,
+    userId,
+    condition,
+    brand,
+    price,
+    category,
+    images,
+    description,
+    status,
+  } = await AdminServices.createProductToDB(req.body);
 
   //send response to client
   sendResponse(res, {
@@ -14,18 +24,21 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
     message: 'Product created successfully',
     data: {
       _id,
+      title,
+      userId,
+      condition,
       brand,
       price,
       category,
+      images,
       description,
-      quantity,
-      inStock,
+      status,
     },
   });
 });
 
 const updateSingleProduct = catchAsync(async (req: Request, res: Response) => {
-  const idOfProduct = req.params.productId;
+  const idOfProduct = req.params.id;
   const updatedProductData = req.body;
 
   const result = await AdminServices.updateSingleProductToDb(
@@ -43,9 +56,9 @@ const updateSingleProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteSingleProduct = catchAsync(async (req: Request, res: Response) => {
-  const idOfProduct = req.params.productId;
+  const { id } = req.params;
 
-  const result = await AdminServices.deleteSingleProductToDb(idOfProduct);
+  const result = await AdminServices.deleteSingleProductToDb(id);
 
   //send response to client
   sendResponse(res, {

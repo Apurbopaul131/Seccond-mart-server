@@ -1,7 +1,1 @@
-export const orderStatus = [
-  'Pending',
-  'Shipping',
-  'Paid',
-  'Completed',
-  'Cancelled',
-];
+export const orderStatus = ['pending', 'completed'];

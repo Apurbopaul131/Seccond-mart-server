@@ -1,5 +1,9 @@
-import mongoose from 'mongoose';
-import { productCategories } from './product.constant';
+import mongoose, { Schema } from 'mongoose';
+import {
+  productCategories,
+  productCondition,
+  productStatus,
+} from './product.constant';
 import { ProductModel, TStationeryProduct } from './product.interface';
 
 //Stationary product schema
@@ -8,10 +12,23 @@ const StationeryProductSchema = new mongoose.Schema<
   ProductModel
 >(
   {
-    name: {
+    title: {
       type: String,
       required: [true, 'name is required'],
       trim: true, // Removes extra spaces
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'UserId is requierd'],
+    },
+    condition: {
+      type: String,
+      required: [true, 'codition is required'],
+      enum: {
+        values: productCondition,
+        message: '{VALUE} is not supported.',
+      },
     },
     brand: {
       type: String,
@@ -31,9 +48,8 @@ const StationeryProductSchema = new mongoose.Schema<
         message: '{VALUE} is not supported.',
       },
     },
-    image: {
-      type: String,
-      default: '',
+    images: {
+      type: [String],
       trim: true,
     },
     description: {
@@ -41,14 +57,18 @@ const StationeryProductSchema = new mongoose.Schema<
       required: [true, 'description is required'],
       trim: true,
     },
-    quantity: {
-      type: Number,
-      required: [true, 'description is required'],
-      min: [0, 'Quantity must be a positive number'],
+    status: {
+      type: String,
+      required: [true, 'Status is required'],
+      enum: {
+        values: productStatus,
+        message: '{VALUE} is not supported.',
+      },
+      default: 'available',
     },
-    inStock: {
-      type: Boolean,
-      required: [true, 'inStock is required'],
+    location: {
+      type: String,
+      required: [true, 'lcoation is required'],
     },
     isDeleted: {
       type: Boolean,
@@ -64,11 +84,11 @@ const StationeryProductSchema = new mongoose.Schema<
 StationeryProductSchema.statics.findProductById = async function (
   productId: string,
 ) {
-  const existingProduct = await StationeryProductModel.findById(productId);
+  const existingProduct = await ListingModel.findById(productId);
   return existingProduct;
 };
 //create model and export
-export const StationeryProductModel = mongoose.model<
-  TStationeryProduct,
-  ProductModel
->('Product', StationeryProductSchema);
+export const ListingModel = mongoose.model<TStationeryProduct, ProductModel>(
+  'Listing',
+  StationeryProductSchema,
+);

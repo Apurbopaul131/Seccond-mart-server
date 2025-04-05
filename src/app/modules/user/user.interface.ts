@@ -8,9 +8,9 @@ export type TUserRole = keyof typeof USER_ROLE;
 export interface TUser {
   name: string;
   email: string;
+  phoneNumber: string;
   password: string;
-  role?: TUserRole;
-  image: string;
+  role: TUserRole;
   isBlocked?: boolean;
 }
 

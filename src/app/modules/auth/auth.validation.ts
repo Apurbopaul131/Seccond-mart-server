@@ -14,6 +14,32 @@ const loginUserValidationSchema = z.object({
     }),
   }),
 });
+
+const updateUserValidationSchema = z.object({
+  body: z.object({
+    name: z
+      .string({
+        required_error: 'Name is required',
+        invalid_type_error: 'Name must be string',
+      })
+      .optional(),
+    email: z
+      .string({
+        required_error: 'Email is required',
+        invalid_type_error: 'Email must be string',
+      })
+      .email({ message: 'Invalid email address' })
+      .optional(),
+    phoneNumber: z
+      .string({
+        required_error: 'Number is required',
+        invalid_type_error: 'Number must be string',
+      })
+      .min(10, { message: 'Must be a valid mobile number' })
+      .max(14, { message: 'Must be a valid mobile number' })
+      .optional(),
+  }),
+});
 const refreshTokenValidationSchema = z.object({
   cookies: z.object({
     refreshToken: z.string({
@@ -24,4 +50,5 @@ const refreshTokenValidationSchema = z.object({
 export const AuthValidations = {
   loginUserValidationSchema,
   refreshTokenValidationSchema,
+  updateUserValidationSchema,
 };

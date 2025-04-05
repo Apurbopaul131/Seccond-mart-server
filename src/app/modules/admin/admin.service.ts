@@ -1,20 +1,15 @@
 import { JwtPayload } from 'jsonwebtoken';
 import AppError from '../../error/AppError';
 import { TStationeryProduct } from '../product/product.interface';
-import { StationeryProductModel } from '../product/product.model';
+import { ListingModel } from '../product/product.model';
 import { User } from '../user/user.model';
 
 //Create product to database
 const createProductToDB = async (productData: TStationeryProduct) => {
-  const isProductExist = await StationeryProductModel.findOne({
-    name: productData?.name,
-    category: productData?.category,
-    isDeleted: false,
+  const result = (await ListingModel.create(productData)).populate({
+    path: 'userId',
+    select: 'name email phoneNumber role isBlocked',
   });
-  if (isProductExist) {
-    throw new AppError(409, 'Product already exist!');
-  }
-  const result = await StationeryProductModel.create(productData);
   return result;
 };
 
@@ -23,27 +18,29 @@ const updateSingleProductToDb = async (
   id: string,
   data: TStationeryProduct,
 ) => {
-  const isDeleted = await StationeryProductModel.findOne({
+  const isDeleted = await ListingModel.findOne({
     _id: id,
     isDeleted: true,
   });
   if (isDeleted) {
     throw new AppError(404, 'Product not found!');
   }
-  //check product exist or not
-  const product = await StationeryProductModel.findById(id);
-  if (!product) {
-    throw new AppError(404, 'Product not found!');
-  }
-  const result = await StationeryProductModel.findByIdAndUpdate(id, data, {
+  const result = await ListingModel.findByIdAndUpdate(id, data, {
     new: true,
-  }).select('name brand price category description quantity inStock image');
+  })
+    .select(
+      'title userId condition brand price category image description status',
+    )
+    .populate({
+      path: 'userId',
+      select: 'name email phoneNumber role isBlocked',
+    });
   return result;
 };
 
 //delete specific product by id form db
 const deleteSingleProductToDb = async (id: string) => {
-  const isDeleted = await StationeryProductModel.findOne({
+  const isDeleted = await ListingModel.findOne({
     _id: id,
     isDeleted: true,
   });
@@ -51,11 +48,11 @@ const deleteSingleProductToDb = async (id: string) => {
     throw new AppError(404, 'Product not found!');
   }
   //check product exist or not
-  const product = await StationeryProductModel.findById(id);
+  const product = await ListingModel.findById(id);
   if (!product) {
     throw new AppError(404, 'Product not found!');
   }
-  const result = await StationeryProductModel.findByIdAndUpdate(
+  const result = await ListingModel.findByIdAndUpdate(
     id,
     { isDeleted: true },
     { new: true },

@@ -32,8 +32,12 @@ const loginUser = async (payload: TLoginUser) => {
 
   //create token and send to the  client
   const jwtPayload = {
+    userId: isUserExist?._id,
+    name: isUserExist?.name,
+    phoneNumber: isUserExist?.phoneNumber,
     email: isUserExist?.email,
     role: isUserExist?.role as TUserRole,
+    isBlocked: isUserExist?.isBlocked,
   };
 
   const accessToken = createToken(
@@ -52,8 +56,8 @@ const loginUser = async (payload: TLoginUser) => {
     refreshToken,
   };
 };
-const getUserFromDB = async (userEmail: string) => {
-  const isUserExist = await User.checkUserExistByEmailId(userEmail);
+const getUserFromDB = async (userId: string) => {
+  const isUserExist = await User.findById(userId);
   if (!isUserExist) {
     throw new AppError(404, 'User not exist!');
   }
@@ -61,6 +65,26 @@ const getUserFromDB = async (userEmail: string) => {
     throw new AppError(403, 'The user is blocked!');
   }
   return isUserExist;
+};
+const updateUserFromDB = async (
+  updatedUserId: string,
+  userData: Partial<TUser>,
+  authUserEmail: string,
+) => {
+  const isUserExist = await User.findById(updatedUserId);
+  if (!isUserExist) {
+    throw new AppError(404, 'User not exist!');
+  }
+  if (isUserExist?.isBlocked) {
+    throw new AppError(403, 'The user is blocked!');
+  }
+  if (authUserEmail !== isUserExist?.email) {
+    throw new AppError(403, 'Invalid user credential');
+  }
+  const updatedUser = await User.findByIdAndUpdate(updatedUserId, userData, {
+    new: true,
+  });
+  return updatedUser;
 };
 const refreshToken = async (token: string) => {
   // checking if the given token is valid
@@ -102,4 +126,5 @@ export const AuthServices = {
   loginUser,
   refreshToken,
   getUserFromDB,
+  updateUserFromDB,
 };

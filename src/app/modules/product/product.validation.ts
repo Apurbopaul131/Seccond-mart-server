@@ -1,16 +1,25 @@
 import { z } from 'zod';
-import { productCategories } from './product.constant';
+import { productCategories, productCondition } from './product.constant';
 
 //create product schema
 const createProductValidationSchema = z.object({
   body: z.object({
-    name: z
+    title: z
       .string({
         required_error: 'Name is requird',
         invalid_type_error: 'Name must be a string',
       })
       .trim(),
-
+    userId: z
+      .string({
+        required_error: 'userId is requird',
+        invalid_type_error: 'User must be a string',
+      })
+      .trim(),
+    condition: z.enum([...productCondition] as [string, ...string[]], {
+      message:
+        'Category value must be | New | Like New | Excellent | Good | Fair| For Parts',
+    }),
     brand: z
       .string({
         required_error: 'Brand is requird',
@@ -30,7 +39,7 @@ const createProductValidationSchema = z.object({
         'Category value must be Writing | Office Supplies | Art Supplies | Educational | Technology',
     }),
 
-    image: z.string().trim().optional().default(''),
+    images: z.array(z.string()).nonempty('Tags array cannot be empty'),
 
     description: z
       .string({
@@ -38,43 +47,42 @@ const createProductValidationSchema = z.object({
         invalid_type_error: 'Description must be a string',
       })
       .trim(),
-
-    quantity: z
-      .number({
-        required_error: 'Quantity is requird',
-        invalid_type_error: 'Quantity must be a number',
+    location: z
+      .string({
+        required_error: 'Condition is requird',
+        invalid_type_error: 'Description must be a string',
       })
-      .min(0, { message: 'Quantity must be a positive number' }),
-
-    inStock: z.boolean({
-      required_error: 'Instock is requird',
-      invalid_type_error: 'Instock must be a boolen',
-    }),
+      .trim(),
   }),
 });
 
 //update product schema
 const updateProductValidationSchema = z.object({
   body: z.object({
-    name: z
+    title: z
       .string({
-        required_error: 'Name is required',
+        required_error: 'Name is requird',
         invalid_type_error: 'Name must be a string',
       })
       .trim()
-      .optional(), // Make name optional
-
+      .optional(),
+    condition: z
+      .enum([...productCondition] as [string, ...string[]], {
+        message:
+          'Category value must be | New | Like New | Excellent | Good | Fair| For Parts',
+      })
+      .optional(),
     brand: z
       .string({
-        required_error: 'Brand is required',
-        invalid_type_error: 'Brand must be a string',
+        required_error: 'Brand is requird',
+        invalid_type_error: 'Name must be a string',
       })
       .trim()
       .optional(),
 
     price: z
       .number({
-        required_error: 'Price is required',
+        required_error: 'Price is requird',
         invalid_type_error: 'Price must be a number',
       })
       .min(0, { message: 'Price must be a positive number' })
@@ -91,25 +99,10 @@ const updateProductValidationSchema = z.object({
 
     description: z
       .string({
-        required_error: 'Description is required',
+        required_error: 'Description is requird',
         invalid_type_error: 'Description must be a string',
       })
       .trim()
-      .optional(),
-
-    quantity: z
-      .number({
-        required_error: 'Quantity is required',
-        invalid_type_error: 'Quantity must be a number',
-      })
-      .min(0, { message: 'Quantity must be a positive number' })
-      .optional(),
-
-    inStock: z
-      .boolean({
-        required_error: 'InStock is required',
-        invalid_type_error: 'InStock must be a boolean',
-      })
       .optional(),
   }),
 });

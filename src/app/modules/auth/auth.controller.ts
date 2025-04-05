@@ -6,7 +6,7 @@ import { AuthServices } from './auth.service';
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.registerUserIntoDB(req.body);
   //destructure the properities to send the client
-  const { _id, name, email, role, isBlocked, image } = result.toObject();
+  const { _id, name, email, role, isBlocked, phoneNumber } = result.toObject();
   //send response to client
   sendResponse(res, {
     statusCode: 200,
@@ -16,7 +16,7 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
       _id,
       name,
       email,
-      image,
+      phoneNumber,
       role,
       isBlocked,
     },
@@ -36,28 +36,51 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
     message: 'Login successful',
     statusCode: 200,
     data: {
-      token: accessToken,
+      accessToken,
     },
   });
 });
 
 const getUser = catchAsync(async (req, res) => {
-  const { email } = req.user;
-  const result = await AuthServices.getUserFromDB(email);
+  const { id } = req.params;
+  const result = await AuthServices.getUserFromDB(id);
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: 'User retrived successfull',
+    message: 'User retrived successfully',
     data: {
+      userId: result?._id,
       name: result?.name,
       email: result?.email,
-      image: result?.image,
+      phoneNumber: result?.phoneNumber,
       role: result?.role,
+      isBlocked: result?.isBlocked,
     },
   });
 });
 
+const updateUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await AuthServices.updateUserFromDB(
+    id,
+    req.body,
+    req.user?.email,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'User updated successfully',
+    data: {
+      name: result?.name,
+      email: result?.email,
+      phoneNumber: result?.phoneNumber,
+      role: result?.role,
+      isBlocked: result?.isBlocked,
+    },
+  });
+});
 const refreshToken = catchAsync(async (req, res) => {
   const { refreshToken } = req.cookies;
   const result = await AuthServices.refreshToken(refreshToken);
@@ -74,4 +97,5 @@ export const AuthControllers = {
   loginUser,
   refreshToken,
   getUser,
+  updateUser,
 };

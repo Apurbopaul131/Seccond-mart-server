@@ -5,49 +5,43 @@ import { TOrder } from './order.interface';
 //order schema
 const OrderSchema = new mongoose.Schema<TOrder>(
   {
-    email: {
-      type: String,
-      required: true,
-      trim: true,
-      match: [
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        'Please provide a valid email address',
-      ],
-    },
-    product: {
+    buyerID: {
       type: Schema.Types.ObjectId,
-      required: [true, 'User id is required'],
-      ref: 'Product',
+      required: [true, 'buyerId is required'],
+      ref: 'User',
       trim: true,
     },
-    quantity: {
-      type: Number,
-      required: true,
-      min: [1, 'Quantity must be at least 1'],
+    sellerID: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'sellerID is required'],
+      ref: 'User',
+      trim: true,
     },
-    totalPrice: {
-      type: Number,
-      required: true,
-      min: [0, 'Total price must be a positive number'],
+    itemID: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'sellerID is required'],
+      ref: 'Listing',
+      trim: true,
     },
+
     status: {
       type: String,
       enum: {
         values: orderStatus,
         message: '{VALUE} is not supported',
       },
-      default: 'Pending',
+      default: 'pending',
     },
-    transaction: {
-      id: String,
-      transactionStatus: String,
-      bank_status: String,
-      sp_code: String,
-      sp_message: String,
-      method: String,
-      date_time: String,
-      payment_status: String,
-    },
+    // transaction: {
+    //   id: String,
+    //   transactionStatus: String,
+    //   bank_status: String,
+    //   sp_code: String,
+    //   sp_message: String,
+    //   method: String,
+    //   date_time: String,
+    //   payment_status: String,
+    // },
   },
   {
     timestamps: true,

@@ -5,18 +5,30 @@ import { orderStatus } from './order.constants';
 //Order validation schema
 const createOrderValidationSchema = z.object({
   body: z.object({
-    product: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
-      message: 'Invalid product ID',
+    buyerID: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      message: 'Invalid buyerId',
     }),
-    quantity: z.number().min(1, 'Quantity must be at least 1'),
+    sellerID: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      message: 'Invalid sellerId',
+    }),
+    itemID: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      message: 'Invalid sellerId',
+    }),
     status: z
       .enum([...orderStatus] as [string, ...string[]], {
-        message: 'Status must be Pending | Shipping',
+        message: 'Status must be pending | shipping',
       })
       .optional(),
   }),
 });
-
+const updateOrderValidationSchema = z.object({
+  body: z.object({
+    status: z.enum([...orderStatus] as [string, ...string[]], {
+      message: 'Status must be pending | completed',
+    }),
+  }),
+});
 export const OrderValidations = {
   createOrderValidationSchema,
+  updateOrderValidationSchema,
 };

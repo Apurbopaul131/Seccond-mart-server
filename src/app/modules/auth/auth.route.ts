@@ -9,7 +9,7 @@ import { AuthValidations } from './auth.validation';
 const router = express.Router();
 
 router.post(
-  '/auth/register-user',
+  '/auth/register',
   validateRequest(UserValidations.createUserValidationSchema),
   AuthControllers.registerUser,
 );
@@ -23,10 +23,13 @@ router.post(
   // validateRequest(AuthValidations.refreshTokenValidationSchema),
   AuthControllers.refreshToken,
 );
-router.get(
-  '/auth/user',
-  auth(USER_ROLE?.admin, USER_ROLE?.user),
-  AuthControllers.getUser,
+router.get('/users/:id', auth(USER_ROLE?.user), AuthControllers.getUser);
+
+router.put(
+  '/users/:id',
+  auth(USER_ROLE?.user),
+  validateRequest(AuthValidations.updateUserValidationSchema),
+  AuthControllers.updateUser,
 );
 
 export const AuthRoutes = router;

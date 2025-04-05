@@ -10,22 +10,22 @@ const router = express.Router();
 
 //create post api to handle post requsest from client
 router.post(
-  '/admin/products',
-  auth(USER_ROLE?.admin),
+  '/listings',
+  auth(USER_ROLE?.user),
   validateRequest(ProductValidatios.createProductValidationSchema),
   AdminControllers.createProduct,
 );
 
 //create delete api to handle delete request from client
 router.delete(
-  '/admin/products/:productId',
-  auth(USER_ROLE?.admin),
+  '/listings/:id',
+  auth(USER_ROLE?.user),
   AdminControllers.deleteSingleProduct,
 );
 
-router.patch(
-  '/admin/products/:productId',
-  auth(USER_ROLE?.admin),
+router.put(
+  '/listings/:id',
+  auth(USER_ROLE?.user),
   validateRequest(ProductValidatios.updateProductValidationSchema),
   AdminControllers.updateSingleProduct,
 );

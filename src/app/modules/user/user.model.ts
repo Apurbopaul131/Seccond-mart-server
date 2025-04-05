@@ -17,6 +17,11 @@ const userSchema = new Schema<TUser, UserModel>(
       required: [true, 'Email is required'],
       unique: true,
     },
+    phoneNumber: {
+      type: String,
+      required: [true, 'Number is required'],
+      unique: true,
+    },
     password: {
       type: String,
       required: [true, 'Password is required.'],
@@ -25,10 +30,6 @@ const userSchema = new Schema<TUser, UserModel>(
       type: String,
       enum: { values: role, message: '{VALUE} is not supported' },
       default: 'user',
-    },
-    image: {
-      type: String,
-      required: [true, 'Image is required'],
     },
     isBlocked: {
       type: Boolean,
@@ -60,6 +61,16 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+//This pre-middewire hook is used for prevent to entry duplicate phoneNumber
+userSchema.pre('save', async function (next) {
+  const isUserExistByPhoneNumber = await User.findOne({
+    phoneNumber: this?.phoneNumber,
+  });
+  if (isUserExistByPhoneNumber) {
+    throw new AppError(409, `${this.phoneNumber} is already registered.`);
+  }
+  next();
+});
 //This post-middewire hook is used for null the password save
 userSchema.post('save', function (doc, next) {
   //set password null
