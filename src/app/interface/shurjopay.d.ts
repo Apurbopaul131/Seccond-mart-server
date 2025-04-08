@@ -21,7 +21,7 @@ declare module 'shurjopay' {
     token_valid_duration: number; // Duration in seconds
   }
 
-  interface PaymentRequest {
+  export interface PaymentRequest {
     prefix: string; // Provided by the shurjoPay team (Mandatory)
     token: string; // Alphanumeric token for communication with shurjoPay (Mandatory)
     return_url: string; // URL to redirect customer after payment processing (Mandatory)

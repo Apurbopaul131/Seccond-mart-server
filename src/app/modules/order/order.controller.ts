@@ -6,7 +6,11 @@ import { OrderServices } from './order.service';
 // import { TStationeryProduct } from '../product/product.interface';
 
 const createOrder = catchAsync(async (req: Request, res: Response) => {
-  const result = await OrderServices.createOrderIntoDB(req.user, req.body);
+  const result = await OrderServices.createOrderIntoDB(
+    req.user,
+    req.body,
+    req.ip!,
+  );
   //send response to client
   sendResponse(res, {
     success: true,
@@ -51,53 +55,19 @@ const updateOrderStatus = async (req: Request, res: Response) => {
     data: result,
   });
 };
-//view user specific orders
-// const getMeOrders = catchAsync(async (req: Request, res: Response) => {
-//   const result = await OrderServices.getMeOrdersFromDB(req?.user?.email);
-//   //send response to client
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: 200,
-//     message: 'User orders retrived successfully.',
-//     data: result,
-//   });
-// });
 
-// const acceptOrder = catchAsync(async (req: Request, res: Response) => {
-//   const { orderId } = req.params;
-//   const result = await OrderServices.acceptOrderIntoDB(orderId);
-//   //send response to client
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: 200,
-//     message: 'Order accepted successfully.',
-//     data: result,
-//   });
-// });
+// Verify the payment successful or not
+const verifyPayment = catchAsync(async (req, res) => {
+  console.log(req?.query);
+  const order = await OrderServices.verifyPayment(req.query.order_id as string);
 
-// const cancleOrder = catchAsync(async (req: Request, res: Response) => {
-//   const { orderId } = req.params;
-//   const result = await OrderServices.cancleOrderIntoDB(orderId);
-//   //send response to client
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: 200,
-//     message: 'Order deleted successfully.',
-//     data: result,
-//   });
-// });
-
-//Verify the payment successful or not
-// const verifyPayment = catchAsync(async (req, res) => {
-//   const order = await OrderServices.verifyPayment(req.query.order_id as string);
-
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: 200,
-//     message: 'Order verified successfully',
-//     data: order,
-//   });
-// });
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: 'Order verified successfully',
+    data: order,
+  });
+});
 
 //export
 export const OrderControllers = {
@@ -105,4 +75,5 @@ export const OrderControllers = {
   viewPurchases,
   viewSales,
   updateOrderStatus,
+  verifyPayment,
 };

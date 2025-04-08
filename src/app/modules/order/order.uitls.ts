@@ -1,5 +1,6 @@
 import Shurjopay, { PaymentResponse, VerificationResponse } from 'shurjopay';
 import config from '../../config';
+
 const shurjopay = new Shurjopay();
 
 shurjopay.config(
@@ -10,7 +11,6 @@ shurjopay.config(
   config.sp.sp_return_url!,
 );
 
-//This method used for intiate an payment
 const makePaymentAsync = async (
   paymentPayload: any,
 ): Promise<PaymentResponse> => {
@@ -23,7 +23,6 @@ const makePaymentAsync = async (
   });
 };
 
-//This method is used for verify the payment
 const verifiedPaymentAsync = async (
   order_id: string,
 ): Promise<VerificationResponse[]> => {
@@ -35,7 +34,7 @@ const verifiedPaymentAsync = async (
     );
   });
 };
-export const orderUitls = {
+export const OrderUitls = {
   makePaymentAsync,
   verifiedPaymentAsync,
 };

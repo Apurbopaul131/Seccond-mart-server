@@ -29,27 +29,12 @@ router.put(
   validateRequest(OrderValidations.updateOrderValidationSchema),
   OrderControllers.updateOrderStatus,
 );
-// //get me orders
-// router.get('/me-orders', auth(USER_ROLE.user), OrderControllers.getMeOrders);
 
-//accept order(status pending to shipping)
-// router.put(
-//   '/orders/accept-order/:orderId',
-//   auth(USER_ROLE.admin),
-//   OrderControllers.acceptOrder,
-// );
-// router.delete(
-//   '/orders/cancle-order/:orderId',
-//   auth(USER_ROLE?.admin),
-//   OrderControllers.cancleOrder,
-// );
-// router.get(
-//   '/orders/verify',
-//   auth(USER_ROLE.user),
-//   OrderControllers.verifyPayment,
-// );
-// //create get route to handle all post request to client
-// router.get('/orders/revenue', OrderControllers.callculateRevenue);
+router.get(
+  '/transactions/verify',
+  auth(USER_ROLE.user),
+  OrderControllers.verifyPayment,
+);
 
 //export router
 export const orderRouter = router;

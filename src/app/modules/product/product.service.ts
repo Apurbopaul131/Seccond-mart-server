@@ -15,7 +15,10 @@ const getAllproductFromDB = async (query: Record<string, unknown>) => {
     .paginate()
     .fields();
   const meta = await productQuery.countTotal();
-  const result = await productQuery.modelQuery;
+  const result = await productQuery.modelQuery.populate({
+    path: 'userId',
+    select: 'name email phoneNumber role isBlocked',
+  });
   return {
     meta,
     result,
@@ -53,7 +56,7 @@ const getSingleProductToDb = async (id: string) => {
   }
   const result = await ListingModel.findById(id)
     .select(
-      'title userId condition brand price category image description status location',
+      'title userId condition brand price category images description status location',
     )
     .populate({
       path: 'userId',
