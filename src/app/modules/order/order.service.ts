@@ -25,8 +25,7 @@ const createOrderIntoDB = async (
     _id: orderData?.itemID,
     isDeleted: false,
   });
-  console.log('userId', userData?.userId);
-  console.log('product User id', isProductExist?.userId.toString());
+
   if (userData?.userId === isProductExist?.userId.toString()) {
     throw new AppError(409, 'User can not buy his own product.');
   }
@@ -61,14 +60,14 @@ const createOrderIntoDB = async (
       },
     });
   }
-  return payment;
+  return payment.checkout_url;
 };
 
 const viewAllPurchaseFromDB = async (userId: string) => {
   const result = await OrderModel.find({
     buyerID: userId,
   })
-    .select('buyerID sellerID itemID status')
+    .select('buyerID sellerID itemID status createdAt transaction')
     .populate({
       path: 'buyerID sellerID',
       select: 'name email phoneNumber role isBlocked',
@@ -85,7 +84,7 @@ const viewAllSalesFromDB = async (userId: string) => {
   const result = await OrderModel.find({
     sellerID: userId,
   })
-    .select('buyerID sellerID itemID status')
+    .select('buyerID sellerID itemID status createdAt transaction')
     .populate({
       path: 'buyerID sellerID',
       select: 'name email phoneNumber role isBlocked',
@@ -112,6 +111,13 @@ const updateOrderStatusIntoDB = async (
   return result;
 };
 
+// const getSingleTransactionIntoDB = async (itemID: string) => {
+//   const result = await OrderModel.findOne({ itemID });
+//   if (!result) {
+//     throw new AppError(404, 'Product not found in transaction');
+//   }
+//   return result;
+// };
 const verifyPayment = async (order_id: string) => {
   const verifiedPayment = await OrderUitls.verifiedPaymentAsync(order_id);
   if (verifiedPayment.length) {

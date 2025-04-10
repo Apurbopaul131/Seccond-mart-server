@@ -16,5 +16,11 @@ router.get(
 //create get api to handle get request from client
 router.get('/listings/:id', ProductControllers.getSingleProduct);
 
+router.put(
+  '/listings/mark-sold/:id',
+  auth(USER_ROLE?.user),
+  ProductControllers.markAsSold,
+);
+
 //export
 export const productRouter = router;

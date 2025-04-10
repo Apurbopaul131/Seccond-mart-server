@@ -16,7 +16,9 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: 200,
     message: 'Order created successfully.',
-    data: result,
+    data: {
+      checkout_url: result,
+    },
   });
 });
 
@@ -45,7 +47,7 @@ const viewSales = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updateOrderStatus = async (req: Request, res: Response) => {
+const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await OrderServices.updateOrderStatusIntoDB(id, req.body);
   sendResponse(res, {
@@ -54,11 +56,21 @@ const updateOrderStatus = async (req: Request, res: Response) => {
     message: 'Order updated successfully',
     data: result,
   });
-};
+});
+
+// const getSingleTransaction = catchAsync(async (req: Request, res: Response) => {
+//   const { id } = req.params;
+//   const result = await OrderServices.getSingleTransactionIntoDB(id);
+//   sendResponse(res, {
+//     success: true,
+//     statusCode: 200,
+//     message: 'Order retrived successfully',
+//     data: result,
+//   });
+// });
 
 // Verify the payment successful or not
 const verifyPayment = catchAsync(async (req, res) => {
-  console.log(req?.query);
   const order = await OrderServices.verifyPayment(req.query.order_id as string);
 
   sendResponse(res, {

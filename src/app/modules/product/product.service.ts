@@ -1,5 +1,6 @@
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
+import OrderModel from '../order/order.model';
 import { searchableFields } from './product.constant';
 import { ListingModel } from './product.model';
 
@@ -67,10 +68,25 @@ const getSingleProductToDb = async (id: string) => {
   }
   return result;
 };
-
+const markAsSoldIntoDB = async (itemID: string) => {
+  const prodcutExistInTransaction = await OrderModel.findOne({ itemID });
+  if (!prodcutExistInTransaction) {
+    throw new AppError(404, 'Payment are not initiated yet.');
+  }
+  if (prodcutExistInTransaction?.status === 'pending') {
+    throw new AppError(202, 'Payment status is pending.');
+  }
+  const result = await ListingModel.findByIdAndUpdate(
+    itemID,
+    { status: 'sold' },
+    { new: true },
+  );
+  return result;
+};
 //export
 export const ProductServices = {
   getSingleProductToDb,
   getAllproductFromDB,
   getMeAllproductFromDB,
+  markAsSoldIntoDB,
 };
