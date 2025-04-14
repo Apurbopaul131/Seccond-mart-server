@@ -13,16 +13,16 @@ const order_validation_1 = require("./order.validation");
 //create router object
 const router = express_1.default.Router();
 //create post route to handle all post request to client
-router.post('/orders', (0, auth_1.default)(user_constant_1.USER_ROLE.user), (0, validateRequest_1.default)(order_validation_1.OrderValidations.createOrderValidationSchema), order_controller_1.OrderControllers.createOrder);
+router.post('/transactions', (0, auth_1.default)(user_constant_1.USER_ROLE.user), (0, validateRequest_1.default)(order_validation_1.OrderValidations.createOrderValidationSchema), order_controller_1.OrderControllers.createOrder);
 //view all orders
-router.get('/orders', (0, auth_1.default)(user_constant_1.USER_ROLE.admin), order_controller_1.OrderControllers.viewOrders);
-//get me orders
-router.get('/me-orders', (0, auth_1.default)(user_constant_1.USER_ROLE.user), order_controller_1.OrderControllers.getMeOrders);
-//accept order(status pending to shipping)
-router.patch('/orders/accept-order/:orderId', (0, auth_1.default)(user_constant_1.USER_ROLE.admin), order_controller_1.OrderControllers.acceptOrder);
-router.delete('/orders/cancle-order/:orderId', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.admin), order_controller_1.OrderControllers.cancleOrder);
-router.get('/orders/verify', (0, auth_1.default)(user_constant_1.USER_ROLE.user), order_controller_1.OrderControllers.verifyPayment);
-//create get route to handle all post request to client
-// router.get('/orders/revenue', OrderControllers.callculateRevenue);
+router.get('/sales/:userId', (0, auth_1.default)(user_constant_1.USER_ROLE.user), order_controller_1.OrderControllers.viewSales);
+router.get('/purchases/:userId', (0, auth_1.default)(user_constant_1.USER_ROLE.user), order_controller_1.OrderControllers.viewPurchases);
+router.put('/transactions/:id', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user), (0, validateRequest_1.default)(order_validation_1.OrderValidations.updateOrderValidationSchema), order_controller_1.OrderControllers.updateOrderStatus);
+// router.get(
+//   '/transactions/:id',
+//   auth(USER_ROLE?.user),
+//   OrderControllers.getSingleTransaction,
+// );
+router.get('/transactions/verify', (0, auth_1.default)(user_constant_1.USER_ROLE.user), order_controller_1.OrderControllers.verifyPayment);
 //export router
 exports.orderRouter = router;

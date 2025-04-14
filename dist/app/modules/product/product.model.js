@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,19 +41,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StationeryProductModel = void 0;
-const mongoose_1 = __importDefault(require("mongoose"));
+exports.ListingModel = void 0;
+const mongoose_1 = __importStar(require("mongoose"));
 const product_constant_1 = require("./product.constant");
 //Stationary product schema
 const StationeryProductSchema = new mongoose_1.default.Schema({
-    name: {
+    title: {
         type: String,
         required: [true, 'name is required'],
         trim: true, // Removes extra spaces
+    },
+    userId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'UserId is requierd'],
+    },
+    condition: {
+        type: String,
+        required: [true, 'codition is required'],
+        enum: {
+            values: product_constant_1.productCondition,
+            message: '{VALUE} is not supported.',
+        },
     },
     brand: {
         type: String,
@@ -40,9 +83,8 @@ const StationeryProductSchema = new mongoose_1.default.Schema({
             message: '{VALUE} is not supported.',
         },
     },
-    image: {
-        type: String,
-        default: '',
+    images: {
+        type: [String],
         trim: true,
     },
     description: {
@@ -50,14 +92,18 @@ const StationeryProductSchema = new mongoose_1.default.Schema({
         required: [true, 'description is required'],
         trim: true,
     },
-    quantity: {
-        type: Number,
-        required: [true, 'description is required'],
-        min: [0, 'Quantity must be a positive number'],
+    status: {
+        type: String,
+        required: [true, 'Status is required'],
+        enum: {
+            values: product_constant_1.productStatus,
+            message: '{VALUE} is not supported.',
+        },
+        default: 'available',
     },
-    inStock: {
-        type: Boolean,
-        required: [true, 'inStock is required'],
+    location: {
+        type: String,
+        required: [true, 'lcoation is required'],
     },
     isDeleted: {
         type: Boolean,
@@ -69,9 +115,9 @@ const StationeryProductSchema = new mongoose_1.default.Schema({
 //Custom statics method that is used for check product is exist or not
 StationeryProductSchema.statics.findProductById = function (productId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const existingProduct = yield exports.StationeryProductModel.findById(productId);
+        const existingProduct = yield exports.ListingModel.findById(productId);
         return existingProduct;
     });
 };
 //create model and export
-exports.StationeryProductModel = mongoose_1.default.model('Product', StationeryProductSchema);
+exports.ListingModel = mongoose_1.default.model('Listing', StationeryProductSchema);

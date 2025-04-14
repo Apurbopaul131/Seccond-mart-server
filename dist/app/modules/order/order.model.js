@@ -37,30 +37,23 @@ const mongoose_1 = __importStar(require("mongoose"));
 const order_constants_1 = require("./order.constants");
 //order schema
 const OrderSchema = new mongoose_1.default.Schema({
-    email: {
-        type: String,
-        required: true,
-        trim: true,
-        match: [
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-            'Please provide a valid email address',
-        ],
-    },
-    product: {
+    buyerID: {
         type: mongoose_1.Schema.Types.ObjectId,
-        required: [true, 'User id is required'],
-        ref: 'Product',
+        required: [true, 'buyerId is required'],
+        ref: 'User',
         trim: true,
     },
-    quantity: {
-        type: Number,
-        required: true,
-        min: [1, 'Quantity must be at least 1'],
+    sellerID: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        required: [true, 'sellerID is required'],
+        ref: 'User',
+        trim: true,
     },
-    totalPrice: {
-        type: Number,
-        required: true,
-        min: [0, 'Total price must be a positive number'],
+    itemID: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        required: [true, 'sellerID is required'],
+        ref: 'Listing',
+        trim: true,
     },
     status: {
         type: String,
@@ -68,7 +61,7 @@ const OrderSchema = new mongoose_1.default.Schema({
             values: order_constants_1.orderStatus,
             message: '{VALUE} is not supported',
         },
-        default: 'Pending',
+        default: 'pending',
     },
     transaction: {
         id: String,

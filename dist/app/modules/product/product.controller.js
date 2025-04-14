@@ -16,36 +16,6 @@ exports.ProductControllers = void 0;
 const catchAsync_1 = __importDefault(require("../../uitls/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../uitls/sendResponse"));
 const product_service_1 = require("./product.service");
-// //get procuts by searchterm
-// const getProducts = async (req: Request, res: Response): Promise<any> => {
-//   try {
-//     const searchTerm = req.query.searchTerm;
-//     const result = await ProductServices.getProductsToDb(searchTerm as string);
-//     //Execute the data does not exist in database
-//     if (result === undefined || result.length == 0) {
-//       return res.status(404).json({
-//         message: 'Product not found!',
-//         success: false,
-//       });
-//     }
-//     //send response to client
-//     return res.status(200).json({
-//       message: 'Products retrieved successfully',
-//       success: true,
-//       data: result,
-//     });
-//   } catch (err: any) {
-//     res.status(400).json({
-//       message: 'Validation failed',
-//       success: false,
-//       error: {
-//         name: err.name,
-//         errors: err.errors,
-//       },
-//       stack: err.stack,
-//     });
-//   }
-// };
 //get single product
 const getAllProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { meta, result } = yield product_service_1.ProductServices.getAllproductFromDB(req.query);
@@ -58,9 +28,21 @@ const getAllProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result,
     });
 }));
+const getMeProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const { meta, result } = yield product_service_1.ProductServices.getMeAllproductFromDB((_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.userId, req.query);
+    //send response to client
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: 200,
+        message: 'Products retrieved successfully',
+        meta: meta,
+        data: result,
+    });
+}));
 const getSingleProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const idOfProduct = req.params.productId;
-    const result = yield product_service_1.ProductServices.getSingleProductToDb(idOfProduct);
+    const { id } = req.params;
+    const result = yield product_service_1.ProductServices.getSingleProductToDb(id);
     //send response to client
     (0, sendResponse_1.default)(res, {
         success: true,
@@ -69,8 +51,21 @@ const getSingleProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 
         data: result,
     });
 }));
+const markAsSold = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield product_service_1.ProductServices.markAsSoldIntoDB(id);
+    //send response to client
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: 200,
+        message: 'Mark as sold successfully.',
+        data: result,
+    });
+}));
 //Export all functions
 exports.ProductControllers = {
     getSingleProduct,
     getAllProduct,
+    getMeProducts,
+    markAsSold,
 };

@@ -12,11 +12,12 @@ const admin_route_1 = require("./app/modules/admin/admin.route");
 const auth_route_1 = require("./app/modules/auth/auth.route");
 const order_routes_1 = require("./app/modules/order/order.routes");
 const product_routes_1 = require("./app/modules/product/product.routes");
+const wishlist_routes_1 = require("./app/modules/wishlist/wishlist.routes");
 const app = (0, express_1.default)();
 //parsers
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
-    origin: 'https://stationary-shop-client-one.vercel.app',
+    origin: 'https://seccond-hand-client.vercel.app',
     credentials: true,
 }));
 app.use((0, cookie_parser_1.default)());
@@ -25,6 +26,7 @@ app.use('/api', auth_route_1.AuthRoutes);
 app.use('/api', product_routes_1.productRouter);
 app.use('/api', order_routes_1.orderRouter);
 app.use('/api', admin_route_1.AdminRouter);
+app.use('/api', wishlist_routes_1.WishListRouter);
 //check application running or not
 app.get('/', (req, res) => {
     res.json({

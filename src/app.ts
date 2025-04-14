@@ -5,6 +5,7 @@ import globalErrorHandler from './app/middlewires/globalError';
 import notFound from './app/middlewires/notFound';
 import { AdminRouter } from './app/modules/admin/admin.route';
 import { AuthRoutes } from './app/modules/auth/auth.route';
+import { messageRouter } from './app/modules/messages/messages.router';
 import { orderRouter } from './app/modules/order/order.routes';
 import { productRouter } from './app/modules/product/product.routes';
 import { WishListRouter } from './app/modules/wishlist/wishlist.routes';
@@ -15,7 +16,7 @@ const app: Application = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://seccond-hand-client.vercel.app',
     credentials: true,
   }),
 );
@@ -27,6 +28,7 @@ app.use('/api', productRouter);
 app.use('/api', orderRouter);
 app.use('/api', AdminRouter);
 app.use('/api', WishListRouter);
+app.use('/api', messageRouter);
 
 //check application running or not
 app.get('/', (req: Request, res: Response) => {

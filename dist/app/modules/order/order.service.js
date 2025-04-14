@@ -18,122 +18,102 @@ const product_model_1 = require("../product/product.model");
 const user_model_1 = require("../user/user.model");
 const order_model_1 = __importDefault(require("./order.model"));
 const order_uitls_1 = require("./order.uitls");
-//Find oredered product form product collection
-// const findOrderdProductToProductCollection = async (productId: string) => {
-//   const result = await StationeryProductModel.findById(productId);
-//   return result;
-// };
 //Create an order to orders collecion
 const createOrderIntoDB = (userData, orderData, client_ip) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.User.findOne({ email: userData === null || userData === void 0 ? void 0 : userData.email });
-    const isDeleted = yield product_model_1.StationeryProductModel.findOne({
-        _id: orderData === null || orderData === void 0 ? void 0 : orderData.product,
-        isDeleted: true,
+    const user = yield user_model_1.User.findById(userData === null || userData === void 0 ? void 0 : userData.userId);
+    //check authenticate user
+    if ((userData === null || userData === void 0 ? void 0 : userData.userId) !== (orderData === null || orderData === void 0 ? void 0 : orderData.buyerID)) {
+        throw new AppError_1.default(403, 'Invalid credentials');
+    }
+    if (!user) {
+        throw new AppError_1.default(404, 'Product not found!');
+    }
+    const isProductExist = yield product_model_1.ListingModel.findOne({
+        _id: orderData === null || orderData === void 0 ? void 0 : orderData.itemID,
+        isDeleted: false,
     });
-    if (isDeleted) {
+    if ((userData === null || userData === void 0 ? void 0 : userData.userId) === (isProductExist === null || isProductExist === void 0 ? void 0 : isProductExist.userId.toString())) {
+        throw new AppError_1.default(409, 'User can not buy his own product.');
+    }
+    if (!isProductExist) {
         throw new AppError_1.default(404, 'Product not found!');
     }
-    const existProduct = yield product_model_1.StationeryProductModel.findProductById(orderData.product.toString());
-    //product exist or not
-    if (!existProduct) {
-        throw new AppError_1.default(404, 'Product not found!');
-    }
-    //Order excced the limit quantity or not
-    if (orderData.quantity > existProduct.quantity) {
-        throw new AppError_1.default(404, 'Do not have sufficient product!!');
-    }
-    const totalPrice = ((existProduct === null || existProduct === void 0 ? void 0 : existProduct.price) * orderData.quantity).toFixed(2);
-    //create order into db
-    const finalOrderdProductData = Object.assign(Object.assign({}, orderData), { email: userData === null || userData === void 0 ? void 0 : userData.email, totalPrice });
-    const orderedProduct = yield order_model_1.default.create(finalOrderdProductData);
-    // payment integration
-    const shurjopayPayload = {
-        amount: totalPrice,
-        order_id: user === null || user === void 0 ? void 0 : user._id,
+    const orderedProduct = yield order_model_1.default.create(orderData);
+    // const existedBuyer = await User?.findById(orderedProduct?.buyerID);
+    const existedOrderProduct = yield product_model_1.ListingModel.findById(orderedProduct === null || orderedProduct === void 0 ? void 0 : orderedProduct.itemID);
+    //payment integration
+    const paymentPaylod = {
+        amount: isProductExist === null || isProductExist === void 0 ? void 0 : isProductExist.price,
+        order_id: orderedProduct === null || orderedProduct === void 0 ? void 0 : orderedProduct._id,
         currency: 'BDT',
         customer_name: user === null || user === void 0 ? void 0 : user.name,
-        customer_address: 'N/A',
+        customer_address: existedOrderProduct === null || existedOrderProduct === void 0 ? void 0 : existedOrderProduct.location,
+        client_ip: client_ip,
+        customer_phone: user === null || user === void 0 ? void 0 : user.phoneNumber,
+        customer_city: existedOrderProduct === null || existedOrderProduct === void 0 ? void 0 : existedOrderProduct.location,
         customer_email: user === null || user === void 0 ? void 0 : user.email,
-        customer_phone: 'N/A',
-        customer_city: 'N/A',
-        client_ip,
     };
-    const payment = yield order_uitls_1.orderUitls.makePaymentAsync(shurjopayPayload);
+    const payment = yield order_uitls_1.OrderUitls.makePaymentAsync(paymentPaylod);
     if (payment.transactionStatus) {
-        yield order_model_1.default.findByIdAndUpdate(orderedProduct._id, {
+        yield order_model_1.default.findByIdAndUpdate(orderedProduct === null || orderedProduct === void 0 ? void 0 : orderedProduct._id, {
             transaction: {
-                id: payment === null || payment === void 0 ? void 0 : payment.sp_order_id,
-                transactionStatus: payment === null || payment === void 0 ? void 0 : payment.transactionStatus,
+                id: payment.sp_order_id,
+                transactionStatus: payment.transactionStatus,
             },
         });
     }
-    return payment === null || payment === void 0 ? void 0 : payment.checkout_url;
+    return payment.checkout_url;
 });
-const viewAllOrderFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
+const viewAllPurchaseFromDB = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield order_model_1.default.find({
-        'transaction.payment_status': 'Success',
+        buyerID: userId,
     })
-        .select('email product quantity totalPrice status transaction')
+        .select('buyerID sellerID itemID status createdAt transaction')
         .populate({
-        path: 'product',
-        select: 'name barnd price category image description quantity inStock',
+        path: 'buyerID sellerID',
+        select: 'name email phoneNumber role isBlocked',
+    })
+        .populate({
+        path: 'itemID',
+        select: 'title userId condition brand price category images description status location isDeleted',
     });
     return result;
 });
-const getMeOrdersFromDB = (userEmail) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.default.find({ email: userEmail })
-        .select('email product quantity totalPrice status transaction')
+const viewAllSalesFromDB = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order_model_1.default.find({
+        sellerID: userId,
+    })
+        .select('buyerID sellerID itemID status createdAt transaction')
         .populate({
-        path: 'product',
-        select: 'name barnd price category image description quantity inStock',
+        path: 'buyerID sellerID',
+        select: 'name email phoneNumber role isBlocked',
+    })
+        .populate({
+        path: 'itemID',
+        select: 'title userId condition brand price category images description status location isDeleted',
     });
     return result;
 });
-const acceptOrderIntoDB = (orderId) => __awaiter(void 0, void 0, void 0, function* () {
-    const isOrderExist = yield order_model_1.default.findById(orderId);
+const updateOrderStatusIntoDB = (orderID, status) => __awaiter(void 0, void 0, void 0, function* () {
+    const isOrderExist = yield order_model_1.default.findById(orderID);
     if (!isOrderExist) {
-        throw new AppError_1.default(404, 'Order does not exist.');
+        throw new AppError_1.default(404, 'Order not found!');
     }
-    const updatedStatus = yield order_model_1.default.findByIdAndUpdate(orderId, { status: 'Shipping' }, { new: true })
-        .select('email product quantity totalPrice status')
-        .populate({
-        path: 'product',
-        select: 'name barnd price category image description quantity inStock',
+    const result = yield order_model_1.default.findByIdAndUpdate(orderID, status, {
+        new: true,
     });
-    return updatedStatus;
+    return result;
 });
-const cancleOrderIntoDB = (orderId) => __awaiter(void 0, void 0, void 0, function* () {
-    const isOrderExist = yield order_model_1.default.findById(orderId);
-    if (!isOrderExist) {
-        throw new AppError_1.default(404, 'Order does not exist.');
-    }
-    const deletedOrder = yield order_model_1.default.findByIdAndDelete(orderId)
-        .select('email product quantity totalPrice status')
-        .populate({
-        path: 'product',
-        select: 'name barnd price category image description quantity inStock',
-    });
-    return deletedOrder;
-});
-//Callculate total revenue from all database orders
-// const callculateTotalRevenueToDB = async () => {
-//   const result = await OrderModel.aggregate([
-//     //stage-1
-//     {
-//       $group: {
-//         _id: null,
-//         totalRevenue: { $sum: '$totalPrice' },
-//       },
-//     },
-//     //stage-2
-//     {
-//       $project: { _id: 0, totalRevenue: 1 },
-//     },
-//   ]);
+// const getSingleTransactionIntoDB = async (itemID: string) => {
+//   const result = await OrderModel.findOne({ itemID });
+//   if (!result) {
+//     throw new AppError(404, 'Product not found in transaction');
+//   }
 //   return result;
 // };
 const verifyPayment = (order_id) => __awaiter(void 0, void 0, void 0, function* () {
-    const verifiedPayment = yield order_uitls_1.orderUitls.verifiedPaymentAsync(order_id);
+    var _a;
+    const verifiedPayment = yield order_uitls_1.OrderUitls.verifiedPaymentAsync(order_id);
     if (verifiedPayment.length) {
         yield order_model_1.default.findOneAndUpdate({
             'transaction.id': order_id,
@@ -145,31 +125,17 @@ const verifyPayment = (order_id) => __awaiter(void 0, void 0, void 0, function* 
             'transaction.method': verifiedPayment[0].method,
             'transaction.date_time': verifiedPayment[0].date_time,
             'transaction.payment_status': verifiedPayment[0].bank_status,
+            status: ((_a = verifiedPayment[0]) === null || _a === void 0 ? void 0 : _a.bank_status) === 'Success'
+                ? 'completed'
+                : 'pending',
         });
-    }
-    //payment success then reduce quantity and update the stock status
-    if (verifiedPayment[0].bank_status === 'Success') {
-        const orderedData = yield order_model_1.default.findOne({
-            'transaction.id': order_id,
-        });
-        const existingProduct = yield product_model_1.StationeryProductModel.findById(orderedData === null || orderedData === void 0 ? void 0 : orderedData.product);
-        if (orderedData && existingProduct) {
-            const remainingProductQuantity = (existingProduct === null || existingProduct === void 0 ? void 0 : existingProduct.quantity) - (orderedData === null || orderedData === void 0 ? void 0 : orderedData.quantity);
-            const updatedProduct = {
-                quantity: remainingProductQuantity,
-                inStock: remainingProductQuantity > 0 ? true : false,
-            };
-            //update product data
-            yield product_model_1.StationeryProductModel.findByIdAndUpdate(existingProduct === null || existingProduct === void 0 ? void 0 : existingProduct._id, updatedProduct);
-        }
     }
     return verifiedPayment;
 });
 exports.OrderServices = {
     createOrderIntoDB,
-    viewAllOrderFromDB,
-    getMeOrdersFromDB,
-    acceptOrderIntoDB,
-    cancleOrderIntoDB,
+    viewAllPurchaseFromDB,
+    viewAllSalesFromDB,
+    updateOrderStatusIntoDB,
     verifyPayment,
 };
