@@ -58,17 +58,6 @@ const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// const getSingleTransaction = catchAsync(async (req: Request, res: Response) => {
-//   const { id } = req.params;
-//   const result = await OrderServices.getSingleTransactionIntoDB(id);
-//   sendResponse(res, {
-//     success: true,
-//     statusCode: 200,
-//     message: 'Order retrived successfully',
-//     data: result,
-//   });
-// });
-
 // Verify the payment successful or not
 const verifyPayment = catchAsync(async (req, res) => {
   const order = await OrderServices.verifyPayment(req.query.order_id as string);

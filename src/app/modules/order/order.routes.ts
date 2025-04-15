@@ -29,11 +29,6 @@ router.put(
   validateRequest(OrderValidations.updateOrderValidationSchema),
   OrderControllers.updateOrderStatus,
 );
-// router.get(
-//   '/transactions/:id',
-//   auth(USER_ROLE?.user),
-//   OrderControllers.getSingleTransaction,
-// );
 
 router.get(
   '/transactions/verify',

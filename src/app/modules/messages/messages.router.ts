@@ -13,5 +13,10 @@ router.post(
   validateRequest(MessageValidations.createMessageValidationSchema),
   MessageController.createMessage,
 );
+router.get(
+  '/messages/:userId',
+  auth(USER_ROLE?.user),
+  MessageController.getMessage,
+);
 
 export const messageRouter = router;

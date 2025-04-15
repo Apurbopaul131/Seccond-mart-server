@@ -14,6 +14,19 @@ const createMessage = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMessage = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const result = await MessageServices.getMessageFromDB(userId);
+  //send response to client
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: 'Retrive user massage successfully.',
+    data: result,
+  });
+});
+
 export const MessageController = {
   createMessage,
+  getMessage,
 };

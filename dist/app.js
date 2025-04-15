@@ -10,6 +10,7 @@ const globalError_1 = __importDefault(require("./app/middlewires/globalError"));
 const notFound_1 = __importDefault(require("./app/middlewires/notFound"));
 const admin_route_1 = require("./app/modules/admin/admin.route");
 const auth_route_1 = require("./app/modules/auth/auth.route");
+const messages_router_1 = require("./app/modules/messages/messages.router");
 const order_routes_1 = require("./app/modules/order/order.routes");
 const product_routes_1 = require("./app/modules/product/product.routes");
 const wishlist_routes_1 = require("./app/modules/wishlist/wishlist.routes");
@@ -27,6 +28,7 @@ app.use('/api', product_routes_1.productRouter);
 app.use('/api', order_routes_1.orderRouter);
 app.use('/api', admin_route_1.AdminRouter);
 app.use('/api', wishlist_routes_1.WishListRouter);
+app.use('/api', messages_router_1.messageRouter);
 //check application running or not
 app.get('/', (req, res) => {
     res.json({
