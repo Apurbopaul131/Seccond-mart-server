@@ -104,13 +104,6 @@ const updateOrderStatusIntoDB = (orderID, status) => __awaiter(void 0, void 0, v
     });
     return result;
 });
-// const getSingleTransactionIntoDB = async (itemID: string) => {
-//   const result = await OrderModel.findOne({ itemID });
-//   if (!result) {
-//     throw new AppError(404, 'Product not found in transaction');
-//   }
-//   return result;
-// };
 const verifyPayment = (order_id) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const verifiedPayment = yield order_uitls_1.OrderUitls.verifiedPaymentAsync(order_id);

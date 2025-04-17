@@ -11,9 +11,12 @@ const createMessageIntoDB = async (payload: TMessages) => {
 };
 
 const getMessageFromDB = async (userId: string) => {
-  const receivedMessage = await Messages.find({ receiverID: userId }).select(
-    '_id senderID receiverID message createdAt updatedAt',
-  );
+  const receivedMessage = await Messages.find({ receiverID: userId })
+    .select('_id senderID receiverID message createdAt updatedAt')
+    .populate({
+      path: 'senderID receiverID',
+      select: '_id name email phoneNumber role isBlocked',
+    });
   if (!receivedMessage) {
     throw new AppError(404, 'User message not found!');
   }
