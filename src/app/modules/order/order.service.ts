@@ -32,6 +32,16 @@ const createOrderIntoDB = async (
   if (!isProductExist) {
     throw new AppError(404, 'Product not found!');
   }
+  const isOrderCompleted = await OrderModel.findOne({
+    itemID: orderData?.itemID,
+    status: 'completed',
+  });
+  if (isOrderCompleted) {
+    throw new AppError(
+      409,
+      'Payment are alrady completed but mark as sold yet.',
+    );
+  }
 
   const orderedProduct = await OrderModel.create(orderData);
   // const existedBuyer = await User?.findById(orderedProduct?.buyerID);

@@ -38,6 +38,13 @@ const createOrderIntoDB = (userData, orderData, client_ip) => __awaiter(void 0, 
     if (!isProductExist) {
         throw new AppError_1.default(404, 'Product not found!');
     }
+    const isOrderCompleted = yield order_model_1.default.findOne({
+        itemID: orderData === null || orderData === void 0 ? void 0 : orderData.itemID,
+        status: 'completed',
+    });
+    if (isOrderCompleted) {
+        throw new AppError_1.default(409, 'Payment are alrady completed but mark as sold yet.');
+    }
     const orderedProduct = yield order_model_1.default.create(orderData);
     // const existedBuyer = await User?.findById(orderedProduct?.buyerID);
     const existedOrderProduct = yield product_model_1.ListingModel.findById(orderedProduct === null || orderedProduct === void 0 ? void 0 : orderedProduct.itemID);

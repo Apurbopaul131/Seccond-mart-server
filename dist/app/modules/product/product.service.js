@@ -18,6 +18,22 @@ const AppError_1 = __importDefault(require("../../error/AppError"));
 const order_model_1 = __importDefault(require("../order/order.model"));
 const product_constant_1 = require("./product.constant");
 const product_model_1 = require("./product.model");
+//Create product to database
+const createProductToDB = (productData) => __awaiter(void 0, void 0, void 0, function* () {
+    const isDuplicateProduct = yield product_model_1.ListingModel.findOne({
+        title: productData === null || productData === void 0 ? void 0 : productData.title,
+        brand: productData === null || productData === void 0 ? void 0 : productData.brand,
+        isDeleted: false,
+    });
+    if (isDuplicateProduct) {
+        throw new AppError_1.default(409, 'Product is already exist!');
+    }
+    const result = (yield product_model_1.ListingModel.create(productData)).populate({
+        path: 'userId',
+        select: 'name email phoneNumber role isBlocked',
+    });
+    return result;
+});
 // get all product form DB
 const getAllproductFromDB = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const productQuery = new QueryBuilder_1.default(product_model_1.ListingModel.find({ isDeleted: false }), query)
@@ -70,6 +86,41 @@ const getSingleProductToDb = (id) => __awaiter(void 0, void 0, void 0, function*
     }
     return result;
 });
+const deleteSingleProductToDb = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const isDeleted = yield product_model_1.ListingModel.findOne({
+        _id: id,
+        isDeleted: true,
+    });
+    if (isDeleted) {
+        throw new AppError_1.default(404, 'Product not found!');
+    }
+    //check product exist or not
+    const product = yield product_model_1.ListingModel.findById(id);
+    if (!product) {
+        throw new AppError_1.default(404, 'Product not found!');
+    }
+    const result = yield product_model_1.ListingModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+    return result;
+});
+//update product into database
+const updateSingleProductToDb = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
+    const isDeleted = yield product_model_1.ListingModel.findOne({
+        _id: id,
+        isDeleted: true,
+    });
+    if (isDeleted) {
+        throw new AppError_1.default(404, 'Product not found!');
+    }
+    const result = yield product_model_1.ListingModel.findByIdAndUpdate(id, data, {
+        new: true,
+    })
+        .select('title userId condition brand price category image description status')
+        .populate({
+        path: 'userId',
+        select: 'name email phoneNumber role isBlocked',
+    });
+    return result;
+});
 const markAsSoldIntoDB = (itemID) => __awaiter(void 0, void 0, void 0, function* () {
     const prodcutExistInTransaction = yield order_model_1.default.findOne({ itemID });
     if (!prodcutExistInTransaction) {
@@ -87,4 +138,7 @@ exports.ProductServices = {
     getAllproductFromDB,
     getMeAllproductFromDB,
     markAsSoldIntoDB,
+    createProductToDB,
+    deleteSingleProductToDb,
+    updateSingleProductToDb,
 };

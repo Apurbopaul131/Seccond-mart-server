@@ -1,64 +1,6 @@
 import { JwtPayload } from 'jsonwebtoken';
 import AppError from '../../error/AppError';
-import { TStationeryProduct } from '../product/product.interface';
-import { ListingModel } from '../product/product.model';
 import { User } from '../user/user.model';
-
-//Create product to database
-const createProductToDB = async (productData: TStationeryProduct) => {
-  const result = (await ListingModel.create(productData)).populate({
-    path: 'userId',
-    select: 'name email phoneNumber role isBlocked',
-  });
-  return result;
-};
-
-//update product into database
-const updateSingleProductToDb = async (
-  id: string,
-  data: TStationeryProduct,
-) => {
-  const isDeleted = await ListingModel.findOne({
-    _id: id,
-    isDeleted: true,
-  });
-  if (isDeleted) {
-    throw new AppError(404, 'Product not found!');
-  }
-  const result = await ListingModel.findByIdAndUpdate(id, data, {
-    new: true,
-  })
-    .select(
-      'title userId condition brand price category image description status',
-    )
-    .populate({
-      path: 'userId',
-      select: 'name email phoneNumber role isBlocked',
-    });
-  return result;
-};
-
-//delete specific product by id form db
-const deleteSingleProductToDb = async (id: string) => {
-  const isDeleted = await ListingModel.findOne({
-    _id: id,
-    isDeleted: true,
-  });
-  if (isDeleted) {
-    throw new AppError(404, 'Product not found!');
-  }
-  //check product exist or not
-  const product = await ListingModel.findById(id);
-  if (!product) {
-    throw new AppError(404, 'Product not found!');
-  }
-  const result = await ListingModel.findByIdAndUpdate(
-    id,
-    { isDeleted: true },
-    { new: true },
-  );
-  return result;
-};
 
 const blockedUserByAdminIntoDB = async (
   authenticateUserInfo: JwtPayload,
@@ -98,8 +40,5 @@ const blockedUserByAdminIntoDB = async (
 };
 //export
 export const AdminServices = {
-  createProductToDB,
-  updateSingleProductToDb,
-  deleteSingleProductToDb,
   blockedUserByAdminIntoDB,
 };
