@@ -1,4 +1,4 @@
-# PAPERCARD BACKEND
+# SECCONDMART BACKEND
 
 ## How to locally Install and Run the Project:
 
@@ -13,7 +13,7 @@
 Run the following command in your terminal to clone the repository:
 
 ```javascript
-git clone https://github.com/Apollo-Level2-Web-Dev/batch-4-assignment-2.git
+git clone https://github.com/Apurbopaul131/Seccond-mart-server.git
 ```
 
 ### 3. Navigate to the Project Directory
@@ -42,6 +42,18 @@ Create a .env file in the root directory of the project and add the following en
 //.env
 PORT:5000
 DATABASE_URL: mongodb+srv://<db_username>:<db_password>@newmission.cmtjh.mongodb.net/?retryWrites=true&w=majority&appName=Newmission
+NODE_ENV = development
+JWT_ACCESS_SECRET = 5a10e571cfe9ac9f03995c6b1b9bc6d0a3b637737edaa40d84e5c349cc9f61bf
+JWT_ACCESS_TOKEN_EXPIRES_IN = 10d
+JWT_REFRESH_SECRET = 5822cf23bc307f6d647489e65df119ff040b5586ea5c39ae3dd65cf914a7f3b2
+JWT_REFRESH_TOKEN_EXPIRES_IN = 365d
+BCRYPT_SALT_ROUNDS = 12
+
+SP_ENDPOINT=https://sandbox.shurjopayment.com
+SP_USERNAME=sp_sandbox
+SP_PASSWORD=pyyk97hu&6u6
+SP_PREFIX=SP
+SP_RETURN_URL=https://seccond-hand-client.vercel.app/payment/verify
 
 //Replace your <db_username>, <db_password> and database name.
 ```
@@ -67,5 +79,6 @@ npm run start:dev
 npm run start:prod
 ```
 
-Backend live link: https://stationery-shop-theta.vercel.app
-"# Seccond-mart-server" 
+Backend live link: https://seccond-hand-server.vercel.app
+
+Go to seccond mart frontend source code using [SECCONDMART-FRONTEND](https://github.com/Apurbopaul131/Seccond-mart-client.git)
