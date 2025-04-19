@@ -118,6 +118,9 @@ const updateSingleProductToDb = async (
   if (isDeleted) {
     throw new AppError(404, 'Product not found!');
   }
+  if (!data?.images[0]) {
+    throw new AppError(404, 'Please Selact an image..');
+  }
   const result = await ListingModel.findByIdAndUpdate(id, data, {
     new: true,
   })

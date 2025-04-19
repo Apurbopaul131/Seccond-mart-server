@@ -111,6 +111,9 @@ const updateSingleProductToDb = (id, data) => __awaiter(void 0, void 0, void 0, 
     if (isDeleted) {
         throw new AppError_1.default(404, 'Product not found!');
     }
+    if (!(data === null || data === void 0 ? void 0 : data.images[0])) {
+        throw new AppError_1.default(404, 'Please Selact an image..');
+    }
     const result = yield product_model_1.ListingModel.findByIdAndUpdate(id, data, {
         new: true,
     })
