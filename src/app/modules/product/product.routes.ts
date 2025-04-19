@@ -8,37 +8,39 @@ import { ProductValidatios } from './product.validation';
 //create router object
 const router = express.Router();
 
-//create post api to handle post requsest from client
+//Create a new product listing
 router.post(
   '/listings',
   auth(USER_ROLE?.user),
   validateRequest(ProductValidatios.createProductValidationSchema),
   ProductControllers.createProduct,
 );
-//create delete api to handle delete request from client
+//Remove a listing
 router.delete(
   '/listings/:id',
   auth(USER_ROLE?.user),
   ProductControllers.deleteSingleProduct,
 );
 
-//create update api to handle delete request from client
+//Update listing details
 router.put(
   '/listings/:id',
   auth(USER_ROLE?.user),
   validateRequest(ProductValidatios.updateProductValidationSchema),
   ProductControllers.updateSingleProduct,
 );
-//create get api to handle get request from client
+//Retrieve all available listings
 router.get('/listings', ProductControllers.getAllProduct);
+//Retrive all specific user listings
 router.get(
   '/listings/me',
   auth(USER_ROLE?.user),
   ProductControllers.getMeProducts,
 );
-//create get api to handle get request from client
+//Retrieve details of a specific listing.
 router.get('/listings/:id', ProductControllers.getSingleProduct);
 
+//Mark as sold route
 router.put(
   '/listings/mark-sold/:id',
   auth(USER_ROLE?.user),

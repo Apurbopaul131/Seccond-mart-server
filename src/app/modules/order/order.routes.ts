@@ -8,21 +8,23 @@ import { OrderValidations } from './order.validation';
 //create router object
 const router = express.Router();
 
-//create post route to handle all post request to client
+//create a new transaction
 router.post(
   '/transactions',
   auth(USER_ROLE.user),
   validateRequest(OrderValidations.createOrderValidationSchema),
   OrderControllers.createOrder,
 );
-//view all orders
+//Fetch sales history
 router.get('/sales/:userId', auth(USER_ROLE.user), OrderControllers.viewSales);
 
+// Fetch purchase history
 router.get(
   '/purchases/:userId',
   auth(USER_ROLE.user),
   OrderControllers.viewPurchases,
 );
+//Update transaction status
 router.put(
   '/transactions/:id',
   auth(USER_ROLE?.user),

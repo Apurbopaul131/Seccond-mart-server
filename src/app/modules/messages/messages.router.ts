@@ -7,12 +7,14 @@ import { MessageValidations } from './messages.validation';
 
 const router = express.Router();
 
+// send a message
 router.post(
   '/messages',
   auth(USER_ROLE?.user),
   validateRequest(MessageValidations.createMessageValidationSchema),
   MessageController.createMessage,
 );
+// Retrieve user messages.
 router.get(
   '/messages/:userId',
   auth(USER_ROLE?.user),
