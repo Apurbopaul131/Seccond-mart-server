@@ -12,17 +12,19 @@ const product_controller_1 = require("./product.controller");
 const product_validation_1 = require("./product.validation");
 //create router object
 const router = express_1.default.Router();
-//create post api to handle post requsest from client
+//Create a new product listing
 router.post('/listings', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user), (0, validateRequest_1.default)(product_validation_1.ProductValidatios.createProductValidationSchema), product_controller_1.ProductControllers.createProduct);
-//create delete api to handle delete request from client
+//Remove a listing
 router.delete('/listings/:id', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user), product_controller_1.ProductControllers.deleteSingleProduct);
-//create update api to handle delete request from client
+//Update listing details
 router.put('/listings/:id', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user), (0, validateRequest_1.default)(product_validation_1.ProductValidatios.updateProductValidationSchema), product_controller_1.ProductControllers.updateSingleProduct);
-//create get api to handle get request from client
+//Retrieve all available listings
 router.get('/listings', product_controller_1.ProductControllers.getAllProduct);
+//Retrive all specific user listings
 router.get('/listings/me', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user), product_controller_1.ProductControllers.getMeProducts);
-//create get api to handle get request from client
+//Retrieve details of a specific listing.
 router.get('/listings/:id', product_controller_1.ProductControllers.getSingleProduct);
+//Mark as sold route
 router.put('/listings/mark-sold/:id', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user), product_controller_1.ProductControllers.markAsSold);
 //export
 exports.productRouter = router;
