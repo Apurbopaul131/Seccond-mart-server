@@ -1,7 +1,42 @@
 import { JwtPayload } from 'jsonwebtoken';
+import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { User } from '../user/user.model';
+import { userSearchableFields } from './admin.constant';
 
+const getAllUsersFromDB = async (
+  authenticateUserInfo: JwtPayload,
+  query: Record<string, unknown>,
+) => {
+  const isAdminExist = await User.checkUserExistByEmailId(
+    authenticateUserInfo?.email,
+  );
+  if (!isAdminExist) {
+    throw new AppError(404, 'Admin not found!');
+  }
+
+  const productQuery = new QueryBuilder(User.find({ role: 'user' }), query)
+    .search(userSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  const meta = await productQuery.countTotal();
+  const result = await productQuery.modelQuery;
+  return {
+    meta,
+    result: result.map(({ _id, name, email, phoneNumber, role, isBlocked }) => {
+      return {
+        userId: _id,
+        name,
+        email,
+        phoneNumber,
+        role,
+        isBlocked,
+      };
+    }),
+  };
+};
 const blockedUserByAdminIntoDB = async (
   authenticateUserInfo: JwtPayload,
   userId: string,
@@ -41,4 +76,5 @@ const blockedUserByAdminIntoDB = async (
 //export
 export const AdminServices = {
   blockedUserByAdminIntoDB,
+  getAllUsersFromDB,
 };

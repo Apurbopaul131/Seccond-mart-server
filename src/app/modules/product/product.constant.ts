@@ -21,4 +21,4 @@ export const productCondition = [
   'For Parts',
 ];
 export const productStatus = ['available', 'sold'];
-export const searchableFields = ['name', 'description', 'category'];
+export const searchableFields = ['name', 'description', 'category', 'brand'];

@@ -7,12 +7,13 @@ import { AuthControllers } from './auth.controller';
 import { AuthValidations } from './auth.validation';
 
 const router = express.Router();
-
+//Register a new user.
 router.post(
   '/auth/register',
   validateRequest(UserValidations.createUserValidationSchema),
   AuthControllers.registerUser,
 );
+//user login
 router.post(
   '/auth/login',
   validateRequest(AuthValidations.loginUserValidationSchema),
@@ -23,11 +24,16 @@ router.post(
   // validateRequest(AuthValidations.refreshTokenValidationSchema),
   AuthControllers.refreshToken,
 );
-router.get('/users/:id', auth(USER_ROLE?.user), AuthControllers.getUser);
-
+//Retrieve user details
+router.get(
+  '/users/:id',
+  auth(USER_ROLE?.user, USER_ROLE?.admin),
+  AuthControllers.getUser,
+);
+//Update user details
 router.put(
   '/users/:id',
-  auth(USER_ROLE?.user),
+  auth(USER_ROLE?.user, USER_ROLE?.admin),
   validateRequest(AuthValidations.updateUserValidationSchema),
   AuthControllers.updateUser,
 );

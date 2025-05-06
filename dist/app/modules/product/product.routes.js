@@ -15,7 +15,7 @@ const router = express_1.default.Router();
 //Create a new product listing
 router.post('/listings', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user), (0, validateRequest_1.default)(product_validation_1.ProductValidatios.createProductValidationSchema), product_controller_1.ProductControllers.createProduct);
 //Remove a listing
-router.delete('/listings/:id', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user), product_controller_1.ProductControllers.deleteSingleProduct);
+router.delete('/listings/:id', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user, user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.admin), product_controller_1.ProductControllers.deleteSingleProduct);
 //Update listing details
 router.put('/listings/:id', (0, auth_1.default)(user_constant_1.USER_ROLE === null || user_constant_1.USER_ROLE === void 0 ? void 0 : user_constant_1.USER_ROLE.user), (0, validateRequest_1.default)(product_validation_1.ProductValidatios.updateProductValidationSchema), product_controller_1.ProductControllers.updateSingleProduct);
 //Retrieve all available listings

@@ -3,7 +3,9 @@ import AppError from '../../error/AppError';
 import { ListingModel } from '../product/product.model';
 import { TOrder, TOrderStatus } from './order.interface';
 
+import QueryBuilder from '../../builder/QueryBuilder';
 import { User } from '../user/user.model';
+import { historySearchableFields } from './order.contant';
 import OrderModel from './order.model';
 import { OrderUitls } from './order.uitls';
 
@@ -73,10 +75,36 @@ const createOrderIntoDB = async (
   return payment.checkout_url;
 };
 
-const viewAllPurchaseFromDB = async (userId: string) => {
-  const result = await OrderModel.find({
-    buyerID: userId,
-  })
+const viewAllPurchaseFromDB = async (
+  userId: string,
+  query: Record<string, unknown>,
+) => {
+  // const result = await OrderModel.find({
+  //   buyerID: userId,
+  // })
+  //   .select('buyerID sellerID itemID status createdAt transaction')
+  //   .populate({
+  //     path: 'buyerID sellerID',
+  //     select: 'name email phoneNumber role isBlocked',
+  //   })
+  //   .populate({
+  //     path: 'itemID',
+  //     select:
+  //       'title userId condition brand price category images description status location isDeleted',
+  //   });
+  const productQuery = new QueryBuilder(
+    OrderModel.find({
+      buyerID: userId,
+    }),
+    query,
+  )
+    .search(historySearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  const meta = await productQuery.countTotal();
+  const result = await productQuery.modelQuery
     .select('buyerID sellerID itemID status createdAt transaction')
     .populate({
       path: 'buyerID sellerID',
@@ -87,13 +115,43 @@ const viewAllPurchaseFromDB = async (userId: string) => {
       select:
         'title userId condition brand price category images description status location isDeleted',
     });
-  return result;
+  return {
+    meta,
+    result,
+  };
 };
 
-const viewAllSalesFromDB = async (userId: string) => {
-  const result = await OrderModel.find({
-    sellerID: userId,
-  })
+const viewAllSalesFromDB = async (
+  userId: string,
+  query: Record<string, unknown>,
+) => {
+  // const result = await OrderModel.find({
+  //   sellerID: userId,
+  // })
+  //   .select('buyerID sellerID itemID status createdAt transaction')
+  //   .populate({
+  //     path: 'buyerID sellerID',
+  //     select: 'name email phoneNumber role isBlocked',
+  //   })
+  //   .populate({
+  //     path: 'itemID',
+  //     select:
+  //       'title userId condition brand price category images description status location isDeleted',
+  //   });
+  // return result;
+  const productQuery = new QueryBuilder(
+    OrderModel.find({
+      sellerID: userId,
+    }),
+    query,
+  )
+    .search(historySearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  const meta = await productQuery.countTotal();
+  const result = await productQuery.modelQuery
     .select('buyerID sellerID itemID status createdAt transaction')
     .populate({
       path: 'buyerID sellerID',
@@ -104,7 +162,10 @@ const viewAllSalesFromDB = async (userId: string) => {
       select:
         'title userId condition brand price category images description status location isDeleted',
     });
-  return result;
+  return {
+    meta,
+    result,
+  };
 };
 
 const updateOrderStatusIntoDB = async (

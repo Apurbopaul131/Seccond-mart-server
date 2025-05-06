@@ -6,6 +6,8 @@ import { AdminControllers } from './admin.controller';
 //create router object
 const router = express.Router();
 
+// retrieve all users route
+router.get('/admin/users', auth(USER_ROLE.admin), AdminControllers.getAllUsers);
 //user blocked by update route
 router.patch(
   '/admin/users/:userId/block',

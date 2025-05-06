@@ -25,24 +25,32 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
 //view all order
 const viewPurchases = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params;
-  const result = await OrderServices.viewAllPurchaseFromDB(userId);
+  const { meta, result } = await OrderServices.viewAllPurchaseFromDB(
+    userId,
+    req.query,
+  );
   //send response to client
   sendResponse(res, {
     success: true,
     statusCode: 200,
     message: 'Purchases history retrived successfully.',
+    meta: meta,
     data: result,
   });
 });
 
 const viewSales = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params;
-  const result = await OrderServices.viewAllSalesFromDB(userId);
+  const { meta, result } = await OrderServices.viewAllSalesFromDB(
+    userId,
+    req.query,
+  );
   //send response to client
   sendResponse(res, {
     success: true,
     statusCode: 200,
     message: 'Sales history retrived successfully.',
+    meta: meta,
     data: result,
   });
 });

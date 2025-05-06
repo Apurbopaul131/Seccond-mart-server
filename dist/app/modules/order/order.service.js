@@ -15,7 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrderServices = void 0;
 const AppError_1 = __importDefault(require("../../error/AppError"));
 const product_model_1 = require("../product/product.model");
+const QueryBuilder_1 = __importDefault(require("../../builder/QueryBuilder"));
 const user_model_1 = require("../user/user.model");
+const order_contant_1 = require("./order.contant");
 const order_model_1 = __importDefault(require("./order.model"));
 const order_uitls_1 = require("./order.uitls");
 //Create an order to orders collecion
@@ -71,10 +73,30 @@ const createOrderIntoDB = (userData, orderData, client_ip) => __awaiter(void 0, 
     }
     return payment.checkout_url;
 });
-const viewAllPurchaseFromDB = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.default.find({
+const viewAllPurchaseFromDB = (userId, query) => __awaiter(void 0, void 0, void 0, function* () {
+    // const result = await OrderModel.find({
+    //   buyerID: userId,
+    // })
+    //   .select('buyerID sellerID itemID status createdAt transaction')
+    //   .populate({
+    //     path: 'buyerID sellerID',
+    //     select: 'name email phoneNumber role isBlocked',
+    //   })
+    //   .populate({
+    //     path: 'itemID',
+    //     select:
+    //       'title userId condition brand price category images description status location isDeleted',
+    //   });
+    const productQuery = new QueryBuilder_1.default(order_model_1.default.find({
         buyerID: userId,
-    })
+    }), query)
+        .search(order_contant_1.historySearchableFields)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+    const meta = yield productQuery.countTotal();
+    const result = yield productQuery.modelQuery
         .select('buyerID sellerID itemID status createdAt transaction')
         .populate({
         path: 'buyerID sellerID',
@@ -84,12 +106,36 @@ const viewAllPurchaseFromDB = (userId) => __awaiter(void 0, void 0, void 0, func
         path: 'itemID',
         select: 'title userId condition brand price category images description status location isDeleted',
     });
-    return result;
+    return {
+        meta,
+        result,
+    };
 });
-const viewAllSalesFromDB = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.default.find({
+const viewAllSalesFromDB = (userId, query) => __awaiter(void 0, void 0, void 0, function* () {
+    // const result = await OrderModel.find({
+    //   sellerID: userId,
+    // })
+    //   .select('buyerID sellerID itemID status createdAt transaction')
+    //   .populate({
+    //     path: 'buyerID sellerID',
+    //     select: 'name email phoneNumber role isBlocked',
+    //   })
+    //   .populate({
+    //     path: 'itemID',
+    //     select:
+    //       'title userId condition brand price category images description status location isDeleted',
+    //   });
+    // return result;
+    const productQuery = new QueryBuilder_1.default(order_model_1.default.find({
         sellerID: userId,
-    })
+    }), query)
+        .search(order_contant_1.historySearchableFields)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+    const meta = yield productQuery.countTotal();
+    const result = yield productQuery.modelQuery
         .select('buyerID sellerID itemID status createdAt transaction')
         .populate({
         path: 'buyerID sellerID',
@@ -99,7 +145,10 @@ const viewAllSalesFromDB = (userId) => __awaiter(void 0, void 0, void 0, functio
         path: 'itemID',
         select: 'title userId condition brand price category images description status location isDeleted',
     });
-    return result;
+    return {
+        meta,
+        result,
+    };
 });
 const updateOrderStatusIntoDB = (orderID, status) => __awaiter(void 0, void 0, void 0, function* () {
     const isOrderExist = yield order_model_1.default.findById(orderID);

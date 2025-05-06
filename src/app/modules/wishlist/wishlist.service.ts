@@ -54,6 +54,7 @@ const getWishlistIntoDB = async (userId: string) => {
       select:
         'title userId condition brand price category images description status location',
     });
+
   if (!result) {
     throw new AppError(404, 'No wishlist for this user');
   }
